@@ -1,0 +1,38 @@
+DATA MODELING
+
+Nouns:
+	- tweets
+		- id (int, primary key)
+		- from_user_id(int, foreign key)
+		- text(varchar, 140)
+		- to_user_id(int)
+		- to_user_name(varchar, 50)
+		- in_reply_to_status_id(int, nullable=TRUE)
+		- time_stamp(timedate)
+
+	- users
+		- id(int, primary key)
+		- username [@whatever] (varchar, 50)
+		- name[Jane Doe] (varchar, 256)
+		- Each user has a profile image url(varchar, 256)
+
+	-relationships
+		-id(int, primary key)
+		- user_id(int, foreign key)
+		- user_id_2(int, foreign key)
+		- is_following(bool)
+		- is_followed(bool)
+		- frequency_of tweets
+		- result of imagery thing
+
+this can go in Python, not in a database
+	- imagery
+		- id(int, primary key)
+		- user_id(int, foreign key)
+		- tweet_id(int, foreign key)
+		- Regressive Imagery Dictionary categorization(list). Each list item has:
+			- item.name: name of the category
+			- item.count: number of words in text that fall into that category
+			- item.words: list of words from the text that fall into that category
+			- item.type: primary/secondary/emotions
+

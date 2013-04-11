@@ -1,0 +1,25 @@
+Okay. So.
+
+Here are the dimensions I have to analyze each side of a relationship:
+- Is user_1 following user_2?
+- Is user_2 following user_1?
+- How frequently does user_1 tweet @ user_2?
+- How frequently does user_2 tweet @ user_1?
+- RID pie chart (primary/secondary/emotions)
+- RID categories table (name, count, type, words)
+- Venn diagram: what keywords do users have in common?
+- How long are tweet conversation threads? (This might be hard to figure out)
+- When was the first @reply? (this might be hard depending on how much data Twitter will let me get)
+- How often do you retweet them?
+- How often do they retweet you?
+
+this can go in Python, not in a database
+	- imagery
+		- id(int, primary key)
+		- user_id(int, foreign key)
+		- tweet_id(int, foreign key)
+		- Regressive Imagery Dictionary categorization(list). Each list item has:
+			- item.name: name of the category
+			- item.count: number of words in text that fall into that category
+			- item.words: list of words from the text that fall into that category
+			- item.type: primary/secondary/emotions

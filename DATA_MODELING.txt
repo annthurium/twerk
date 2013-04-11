@@ -5,8 +5,8 @@ Nouns:
 		- id (int, primary key)
 		- from_user_id(int, foreign key)
 		- text(varchar, 140)
-		- to_user_id(int)
-		- to_user_name(varchar, 50)
+		- to_user_id(int, nullable=TRUE)
+		- to_user_name(varchar, 50, nullable=TRUE)
 		- in_reply_to_status_id(int, nullable=TRUE)
 		- time_stamp(timedate)
 
@@ -14,25 +14,15 @@ Nouns:
 		- id(int, primary key)
 		- username [@whatever] (varchar, 50)
 		- name[Jane Doe] (varchar, 256)
-		- Each user has a profile image url(varchar, 256)
+		- profile_image_url(varchar, 256)
+		- followers(list of ints or characters)
+		- following(list of ints or characters)
 
-	-relationships
-		-id(int, primary key)
-		- user_id(int, foreign key)
-		- user_id_2(int, foreign key)
-		- is_following(bool)
-		- is_followed(bool)
-		- frequency_of tweets
-		- result of imagery thing
-
-this can go in Python, not in a database
-	- imagery
-		- id(int, primary key)
-		- user_id(int, foreign key)
-		- tweet_id(int, foreign key)
-		- Regressive Imagery Dictionary categorization(list). Each list item has:
-			- item.name: name of the category
-			- item.count: number of words in text that fall into that category
-			- item.words: list of words from the text that fall into that category
-			- item.type: primary/secondary/emotions
-
+Things to ponder
+- Will users have to authorize my application? Depends on API rate limiting, the type of info I need, etc.
+- error checking for collision when I import tweets into database
+- for @replies to multiple users, how does to_user_id work?
+- When a user hits "analyze," I will need to check and see if they are already in the user database.
+	- if they are, I will need to check for new tweets and paginate them into the database.
+- How far back will Twitter let me get data?
+- how to store a list in database. varchar or use postgres?

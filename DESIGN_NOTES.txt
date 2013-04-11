@@ -23,3 +23,11 @@ this can go in Python, not in a database
 			- item.count: number of words in text that fall into that category
 			- item.words: list of words from the text that fall into that category
 			- item.type: primary/secondary/emotions
+
+
+Things that need to happen:
+- finish data modeling
+- create database
+- install flask if I haven't already
+- figure out json parsing so I can pull info into database
+- write model.py to interface between database and Python

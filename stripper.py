@@ -1,12 +1,9 @@
 import twitter
 import string
+from settings import AUTHENTICATED_API
 #import en
 
 # I know global variables are bad, is there a better way to do this?
-api = twitter.Api(consumer_key='jfSslPak6IKaQkKDa0KQ',
-                      consumer_secret='imTaptYqLhtUFYpsk6NAZP5NNftayqpup6ZyFY7Xbb8',
-                      access_token_key='17101287-E1M6GPPSKTHAcE4fVWSB8AiVB1FGB0ahKlXkndJvc',
-                      access_token_secret='UoW1TTIi73alCrRhwa3ecFnWukcnXP0Qiam7pTSuYU')
 
 USER_NAME = 'annthurium' #obvs this will change later
 MAX_REQUESTABLE_TWEETS = 200
@@ -14,8 +11,7 @@ MAX_REQUESTABLE_TWEETS = 200
 def consume_timeline():
 	# first request returns maximum allowable number of tweets
 	# include_rts must be true in order to return the full number of results specified by count
-	status = api.GetUserTimeline(screen_name=USER_NAME, count=100, include_rts=True)
-	print "relative_created_at", status[-1].relative_created_at
+	status = AUTHENTICATED_API.GetUserTimeline(screen_name=USER_NAME, count=100, include_rts=True)
 	max_id_returned = status[-1].id
 	print "max_id = ", max_id_returned
 	print "text: ", status[-1].text
@@ -38,16 +34,12 @@ def consume_timeline():
 			return len(new_status)
 		else:
 			get_page(max_id_returned_2)
-	get_page(max_id_returned)
+	#get_page(max_id_returned)
 
 	# spot checking for duplicate tweets
 	# for item in status:
 	# 	if item.id==157891732237856768:
 	# 		print item.text
-	
-
-# I get 2882 statuses using max_id_returned-1
-# I get 2897 without. I have duplicates, dammit.
 
 def main():
 	consume_timeline()

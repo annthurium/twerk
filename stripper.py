@@ -1,9 +1,7 @@
 import twitter
 import string
 from settings import AUTHENTICATED_API
-#import en
-
-# I know global variables are bad, is there a better way to do this?
+# import en
 
 USER_NAME = 'annthurium' #obvs this will change later
 MAX_REQUESTABLE_TWEETS = 200
@@ -16,11 +14,16 @@ def consume_timeline():
 	print "max_id = ", max_id_returned
 	print "text: ", status[-1].text
 	print "length:", len(status)
+
+	# Does it make my code run more slowly to define a function inside a function? Should this live somewhere else?
 	def get_page(max_id_returned):
-		new_status = api.GetUserTimeline(screen_name=USER_NAME, count=MAX_REQUESTABLE_TWEETS, include_rts=True, max_id = max_id_returned)
+		new_status = api.GetUserTimeline(screen_name=USER_NAME, count=MAX_REQUESTABLE_TWEETS, include_rts=True, 
+			max_id = max_id_returned)
+
 		# new_status[0] is a duplicate (equivalent to last tweet from previous request)
 		# so we throw it out
 		new_status.pop(0)
+
 		status.extend(new_status)
 		max_id_returned_2 = new_status[-1].id
 		print "text: ", new_status[-1].text
@@ -34,6 +37,7 @@ def consume_timeline():
 			return len(new_status)
 		else:
 			get_page(max_id_returned_2)
+
 	#get_page(max_id_returned)
 
 	# spot checking for duplicate tweets

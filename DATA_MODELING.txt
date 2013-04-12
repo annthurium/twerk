@@ -1,5 +1,5 @@
 DATA MODELING
-
+USE DB FOR THINGS THAT SHOULD BE STORED PERSISTENTLY
 Nouns:
 	- tweets
 		- id (int, primary key)
@@ -18,11 +18,23 @@ Nouns:
 		- followers(list of ints or characters)
 		- following(list of ints or characters)
 
+
+
 Things to ponder
+
+- Should I use classes from twitter-python for SQLAlchemy? Probably not, who knows what all the class is doing.
+
 - Will users have to authorize my application? Depends on API rate limiting, the type of info I need, etc.
+
 - error checking for collision when I import tweets into database
-- for @replies to multiple users, how does to_user_id work?
+
+- for @replies to multiple users, how does to_user_id work? Only the first user in the to_user_id field. The easiest way I've found to do this is to search the text of the tweet for "@username". I'm not going to differentiate between replies and mentions, fuck that.
+
 - When a user hits "analyze," I will need to check and see if they are already in the user database.
-	- if they are, I will need to check for new tweets and paginate them into the database.
+	- if they are, I will need to check for new tweets and paginate them into the database. FUNZIES.
+
 - How far back will Twitter let me get data?
+
 - how to store a list in database. varchar or use postgres?
+
+- keep a list of ideas I have so I an add features later.

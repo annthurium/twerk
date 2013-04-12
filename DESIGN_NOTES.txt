@@ -1,4 +1,4 @@
-Okay. So.
+workon twerk = how to activate virtualenv
 
 Here are the dimensions I have to analyze each side of a relationship:
 - Is user_1 following user_2?
@@ -26,8 +26,8 @@ this can go in Python, not in a database
 
 
 Things that need to happen:
-- finish data modeling
 - create database
-- install flask if I haven't already
-- figure out json parsing so I can pull info into database
+I realized there is a Python wrapper for the Twitter api. I might not have to parse the stupid JSON myself. 
+You can only get 200 statuses per function call. Do I need to worry about API rate limits here?
+
 - write model.py to interface between database and Python

@@ -9,37 +9,39 @@ MAX_REQUESTABLE_TWEETS = 200
 def consume_timeline():
 	# first request returns maximum allowable number of tweets
 	# include_rts must be true in order to return the full number of results specified by count
-	status = AUTHENTICATED_API.GetUserTimeline(screen_name=USER_NAME, count=200, include_rts=True)
-	max_id_returned = status[-1].id
+	timeline = AUTHENTICATED_API.GetUserTimeline(screen_name=USER_NAME, count=200, include_rts=True)
+	max_id_returned = timeline[-1].id
 	print "max_id = ", max_id_returned
-	print "text: ", status[-1].text
-	print "length:", len(status)
+	print "text: ", timeline[-1].text
+	print "length:", len(timeline)
 
 	# Does it make my code run more slowly to define a function inside a function? Should this live somewhere else?
-	def get_page(max_id_returned, status_length):
-		while status_length != 0:
-			new_status = AUTHENTICATED_API.GetUserTimeline(screen_name=USER_NAME, count=MAX_REQUESTABLE_TWEETS, 
+	def get_page(max_id_returned, timeline_length):
+		while timeline_length != 0:
+			new_timeline = AUTHENTICATED_API.GetUserTimeline(screen_name=USER_NAME, count=MAX_REQUESTABLE_TWEETS, 
 				include_rts=True, max_id = max_id_returned)
 
 			# new_status[0] is a duplicate (equivalent to last tweet from previous request)
 			# so we throw it out
-			new_status.pop(0)
+			new_timeline.pop(0)
 
-			status_length = len(new_status)
-			print "status_length", status_length
-			last_status_index = status_length - 1
+			new_timeline_length = len(new_timeline)
+			print "new_timeline_length", new_timeline_length
+			last_status_index = new_timeline_length - 1
 			print "last_status_index", last_status_index
 
-			if status_length == 0:
+			if new_timeline_length == 0:
 				return
 
-			status.extend(new_status)
-			max_id_returned = new_status[last_status_index].id
-			print "text: ", new_status[last_status_index].text
-			print "tweet_id", new_status[last_status_index].id
-			print "len status", len(status)
+			timeline.extend(new_timeline)
+			max_id_returned = new_timeline[last_status_index].id
+			print "text: ", new_timeline[last_status_index].text
+			print "text: ", timeline[-1].text
+			print "tweet_id", new_timeline[last_status_index].id
 
-	get_page(max_id_returned, len(status))
+	get_page(max_id_returned, len(timeline))
+	print "len(timeline)", len(timeline)
+	return timeline
 
 	# spot checking for duplicate tweets
 	# for item in status:

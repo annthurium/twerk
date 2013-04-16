@@ -1,5 +1,18 @@
-<html>
-{% for tweet in replies %}
-	<h2> Text {{tweet}}
- {% endfor %}
-</html>
+{% extends "layout.html" %}
+{% block body %}
+    <title>148-Bit_Love</title>
+    <h1>Some Tweets & Stuff:</h1>
+    	<table class="table table-striped" id ="tweets" align="left">
+    		<th>Text</th>
+    		<th>Time</th>
+    		{% for tweet in tweet_list %}
+    		<tr>
+    		<td>{{ tweet.text }} </td>
+    		<td>{{ tweet.time_stamp }} </td>
+    		</tr>
+    		{% endfor %}
+    	</table>
+
+
+
+{% endblock %}

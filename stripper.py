@@ -6,18 +6,23 @@ from settings import AUTHENTICATED_API
 
 MAX_REQUESTABLE_TWEETS = 200
 
-# why is this function not reaching the end of the timeline? I'm confused. Sigh.
+def check_for_new_tweets_in_db():
+	pass
+
+def get_new_tweets():
+	pass
+
 def consume_timeline(user_name):
 	# first request returns maximum allowable number of tweets
 	# include_rts must be true in order to return the full number of results specified by count
-	timeline = AUTHENTICATED_API.GetUserTimeline(screen_name = user_name, count=200, include_rts=True)
+	timeline = AUTHENTICATED_API.GetUserTimeline(screen_name = user_name, count=MAX_REQUESTABLE_TWEETS, include_rts=True)
 	max_id_returned = timeline[-1].id
 	new_timeline_length = len(timeline)
 
-	# bunch of print statements to be commented out later
-	print "max_id = ", max_id_returned
-	print "text: ", timeline[-1].text
-	print "length:", len(timeline)
+	# testing testing 1-2-3:
+	# print "max_id = ", max_id_returned
+	# print "text: ", timeline[-1].text
+	# print "length:", len(timeline)
 
 	while new_timeline_length != 0:
 		new_timeline = AUTHENTICATED_API.GetUserTimeline(screen_name = user_name, count=MAX_REQUESTABLE_TWEETS, 
@@ -48,6 +53,7 @@ def consume_timeline(user_name):
 	# for item in status:
 	# 	if item.id==157891732237856768:
 	# 		print item.text
+
 
 def find_replies(user, timeline):
 	f = open('data.txt', 'w')

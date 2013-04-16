@@ -1,10 +1,21 @@
-from flask import Flask, render_template, redirect, request, url_for
+from flask import Flask, render_template, redirect, request, url_for, flash, session, g
+from model import session as db_session, User, Tweet
+import model
 import stripper
+
 app = Flask(__name__)
+SECRET_KEY = "dumbass_horse_battery_staple_FOREVAR_AND_EVAR"
 
 @app.route("/")
 def index():
 	return render_template("index.html")
+
+@app.route("/list_tweets")
+def list_tweets():
+	tweet_list = model.session.query(Tweet).filter(Tweet.text.like("%@queerviolet%"))
+	return render_template("list_tweets.html", tweet_list = tweet_list)
+
+#list = session.query(Tweet).filter(Tweet.text.like("%@queerviolet%"))
 
 #def something():
 	#pass

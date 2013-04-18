@@ -21,7 +21,10 @@ def find_newest_tweet_id_in_DB(user_screen_name):
 	
 	# query for tweet with largest ID from user_name, since tweet IDs are sequential
 	newest_tweet = session.query(func.max(Tweet.id)).filter_by(from_user_screen_name = user_screen_name).first()
-	return int(newest_tweet[0])
+	if newest_tweet is not None:
+		return newest_tweet[0]
+	else:
+		return None
 
 def get_tweets(user_screen_name):
 	"""Calls functions add tweets into database, ensuring that there are no duplicates"""
@@ -80,14 +83,12 @@ def load_timeline(timeline):
 			in_reply_to_status_id = item.in_reply_to_status_id, time_stamp = column_time, 
 			from_user_screen_name = item.user.screen_name)
 
-
 		session.add(new_tweet)
 	session.commit()
 
-
-
 def main():
-	user_name = 'annthurium'
+	user_name = 'ohathackbright'
+	find_newest_tweet_id_in_DB(user_name)
 	get_tweets(user_name)
 	# testing 2 tweets:
 	#timeline = AUTHENTICATED_API.GetUserTimeline(screen_name = user_name, count=2, include_rts=True)

@@ -61,7 +61,6 @@ def consume_timeline(user_name, newest_tweet_id):
 	print "last tweet returned", timeline[-1].text
 	return timeline
 
-
 def load_user(username):
 	"""Adds user to database"""
 	u = AUTHENTICATED_API.GetUser(username)
@@ -86,9 +85,12 @@ def load_timeline(timeline):
 	session.commit()
 
 def main():
-	user_name = ''
-	find_newest_tweet_id_in_DB(user_name)
-	get_tweets(user_name)
+	dictionary = AUTHENTICATED_API.GetRateLimitStatus()
+	for k in dictionary:
+		print k, dictionary[k]
+	#user_name = ''
+	#find_newest_tweet_id_in_DB(user_name)
+	#get_tweets(user_name)
 	# testing 2 tweets:
 	#timeline = AUTHENTICATED_API.GetUserTimeline(screen_name = user_name, count=2, include_rts=True)
 

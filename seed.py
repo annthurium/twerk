@@ -5,7 +5,6 @@ from model import Tweet, User
 from model import session
 from datetime import datetime, date
 import time
-import stripper
 
 import twitter
 from settings import AUTHENTICATED_API

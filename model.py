@@ -2,7 +2,7 @@
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine, ForeignKey
-from sqlalchemy import Column, Integer, String, DateTime, func
+from sqlalchemy import Column, Integer, String, DateTime, func, or_
 from sqlalchemy.orm import sessionmaker, relationship, backref, scoped_session
 from datetime import datetime
 
@@ -27,7 +27,7 @@ class Tweet(Base):
 	to_user_screen_name = Column(String(64), nullable = True) # This data also lives elsewhere. Is that bad database design?
 	in_reply_to_status_id = Column(Integer, nullable = True)
 	time_stamp = Column(DateTime)
-	
+
 	user = relationship("User",
 		backref=backref("tweets", order_by = id))
 

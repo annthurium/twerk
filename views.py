@@ -18,20 +18,20 @@ def shutdown_session(exception = None):
 def index():
 	return render_template("index.html")
 
-@app.route("/send_data", methods=["POST"])
-def send_data():
+@app.route("/list_tweets", methods=["POST", "GET"])
+def list_tweets():
     user_1_screen_name = request.form['user_1_screen_name']
     user_2_screen_name = request.form['user_2_screen_name']
+    print user_2_screen_name
+    print user_1_screen_name
+    tweet_list_1 = query_for_tweets(user_1_screen_name, user_2_screen_name)
+    tweet_list_2 = query_for_tweets(user_2_screen_name, user_1_screen_name)
+    return render_template("list_tweets.html", tweet_list = tweet_list_1)
 
-@app.route("/list_tweets")
-def list_tweets():
-	
-	# search user_1_tweet_stream for text like user_2_screen_name
-	user_2_screen_name = 'annthurium'
-	user_1_screen_name = 'queerviolet'
+def query_for_tweets(user_1_screen_name, user_2_screen_name):
 	search_string = "%@" + user_2_screen_name + "%"
 	tweet_list = model.session.query(Tweet).filter(Tweet.text.like(search_string)).filter(Tweet.from_user_screen_name == user_1_screen_name)
-	return render_template("list_tweets.html", tweet_list = tweet_list)
+	return tweet_list
 
 if __name__== "__main__":
 	app.run(debug = True)

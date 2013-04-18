@@ -6,7 +6,7 @@ from sqlalchemy import Column, Integer, String, DateTime, func
 from sqlalchemy.orm import sessionmaker, relationship, backref, scoped_session
 from datetime import datetime
 
-##### this is global within one thread (Thread local)
+##### engine, session are thread local
 
 engine = create_engine("sqlite:///twerk.db", echo = False)
 session = scoped_session(sessionmaker(bind=engine,

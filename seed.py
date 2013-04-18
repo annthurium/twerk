@@ -87,7 +87,7 @@ def load_timeline(timeline):
 	session.commit()
 
 def main():
-	user_name = 'ohathackbright'
+	user_name = ''
 	find_newest_tweet_id_in_DB(user_name)
 	get_tweets(user_name)
 	# testing 2 tweets:

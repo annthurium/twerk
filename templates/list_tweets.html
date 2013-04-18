@@ -1,18 +1,38 @@
 {% extends "layout.html" %}
 {% block body %}
-    <title>148-Bit_Love</title>
-    <h1>Some Tweets & Stuff:</h1>
-    	<table class="table table-striped" id ="tweets" align="left">
+<h1 align="center">Some Tweets & Stuff!!!</h1>
+<div class="row-fluid">
+    <div class="span4">
+
+    	<table class="table table-striped" id ="user_1_tweets" align="left">
+            <h5> Tweets from {{user_1}} to {{user_2}}: </h5>
     		<th>Text</th>
     		<th>Time</th>
-    		{% for tweet in tweet_list %}
+    		{% for tweet in tweet_list_1 %}
     		<tr>
     		<td>{{ tweet.text }} </td>
     		<td>{{ tweet.time_stamp }} </td>
     		</tr>
     		{% endfor %}
     	</table>
-
+    </div>
+    <div class="span4">
+        <h5 align="center">Some analysis is gonna go here. Yep.</h5>
+    </div>
+    <div class="span4">
+        <table class="table table-striped" id ="user_2_tweets" align="right">
+            <h5> Tweets from {{user_2}} to {{user_1}}: </h5>
+            <th>Text</th>
+            <th>Time</th>
+            {% for tweet in tweet_list_2 %}
+            <tr>
+            <td>{{ tweet.text }} </td>
+            <td>{{ tweet.time_stamp }} </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
 
 
 {% endblock %}

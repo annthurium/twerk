@@ -65,8 +65,8 @@ var y = d3.scale.linear()
     .range([height, 0]);
 
 var color = d3.scale.linear()
-    .range(["#aad", "#556"]);
-
+    .range(["#aad", "#111", "#000", "222"]);
+// .range is an array
 var area = d3.svg.area()
     .x(function(d) { return x(d.x); })
     .y0(function(d) { return y(d.y0); })

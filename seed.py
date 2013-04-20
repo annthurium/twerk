@@ -1,4 +1,4 @@
-##### This module makes Twitter api calls to add data into the database.
+##### This module makes Twitter api calls and commits data to the database.
 
 import model
 from model import Tweet, User
@@ -37,17 +37,22 @@ def get_tweets(user_screen_name):
 		load_timeline(timeline)
 
 def consume_timeline(user_name, newest_tweet_id):
-
-	timeline = AUTHENTICATED_API.GetUserTimeline(screen_name = user_name, count=MAX_REQUESTABLE_TWEETS, 
-		include_rts=True, since_id = newest_tweet_id)
+	"""Returns a list of tweets from specified user, stopping at newest_tweet_id"""
+	timeline = AUTHENTICATED_API.GetUserTimeline(screen_name = user_name, 
+		count=MAX_REQUESTABLE_TWEETS, 
+		include_rts=True, 
+		since_id = newest_tweet_id)
 	new_timeline_length = len(timeline)
 	if new_timeline_length == 0:
 		return
 	max_id_returned = timeline[-1].id
 
 	while new_timeline_length > 0:
-		new_timeline = AUTHENTICATED_API.GetUserTimeline(screen_name = user_name, count=MAX_REQUESTABLE_TWEETS, 
-		include_rts=True, since_id = newest_tweet_id, max_id = max_id_returned)
+		new_timeline = AUTHENTICATED_API.GetUserTimeline(screen_name = user_name, 
+			count=MAX_REQUESTABLE_TWEETS, 
+			include_rts=True, 
+			since_id = newest_tweet_id, 
+			max_id = max_id_returned)
 
 		# since max_id is inclusive, new_timeline[0] is a duplicate
 		# so we throw it out:
@@ -64,8 +69,10 @@ def consume_timeline(user_name, newest_tweet_id):
 def load_user(username):
 	"""Adds user to database"""
 	u = AUTHENTICATED_API.GetUser(username)
-	new_user = User(id = u.id, screen_name = u.screen_name, 
-		first_last_name = u.name, profile_img_url = u.profile_image_url)
+	new_user = User(id = u.id, 
+		screen_name = u.screen_name, 
+		first_last_name = u.name, 
+		profile_img_url = u.profile_image_url)
 	print "new_user", new_user.screen_name
 	session.add(new_user)
 	session.commit()
@@ -76,28 +83,26 @@ def load_timeline(timeline):
 		timestamp = item.created_at
 		from_user_sn = item.user.screen_name
 		column_time = datetime.strptime(timestamp, "%a %b %d %H:%M:%S +0000 %Y")
-		new_tweet = Tweet(id = item.id, from_user_id = item.user.id, text = item.text, 
-			to_user_id = item.in_reply_to_user_id, to_user_screen_name = item.in_reply_to_screen_name,
-			in_reply_to_status_id = item.in_reply_to_status_id, time_stamp = column_time, 
+		new_tweet = Tweet(id = item.id, 
+			from_user_id = item.user.id, 
+			text = item.text, 
+			to_user_id = item.in_reply_to_user_id, 
+			to_user_screen_name = item.in_reply_to_screen_name,
+			in_reply_to_status_id = item.in_reply_to_status_id, 
+			time_stamp = column_time, 
 			from_user_screen_name = item.user.screen_name)
 
 		session.add(new_tweet)
 	session.commit()
 
-def main():
+def check_rate_limit_status():
+	"""Should be self-explanatory."""
 	dictionary = AUTHENTICATED_API.GetRateLimitStatus()
 	for k in dictionary:
 		print k, dictionary[k]
-	#user_name = ''
-	#find_newest_tweet_id_in_DB(user_name)
-	#get_tweets(user_name)
-	# testing 2 tweets:
-	#timeline = AUTHENTICATED_API.GetUserTimeline(screen_name = user_name, count=2, include_rts=True)
 
-	#newest = find_newest_tweet_id_in_DB(user_name)
-
-	#timeline = stripper.consume_timeline(user_name)
-	#timeline = consume_timeline(user_name, 0)
+def main():
+	check_rate_limit_status()
 
 if __name__ == "__main__":
 	main()

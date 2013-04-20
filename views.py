@@ -1,6 +1,4 @@
-##### Views for WSGI application live here. 
-##### (Wait, what? WSGI? Oooh, FANCY terminology there, captain.)
-##### Shut your pythonhole you.
+##### Flask views live here (in all their glory.)
 
 from flask import Flask, render_template, redirect, request, url_for, flash, session, g
 from model import session as db_session, User, Tweet
@@ -10,15 +8,21 @@ import seed
 import en
 
 app = Flask(__name__)
-app.secret_key = "sadjkflkjadfsjkl;"
+app.secret_key = "dumbass_horse_battery_staple_FOREVAR_AND_EVAR"
 
 @app.teardown_request
 def shutdown_session(exception = None):
     db_session.remove()
 
+##### Route functions #####
+
 @app.route("/")
 def index():
 	return render_template("index.html")
+
+@app.route("/streamgraph_sample")
+def streamgraph_sample():
+    return render_template("streamgraph_sample.html")
 
 @app.route("/about")
 def about():
@@ -38,14 +42,11 @@ def list_tweets():
     tweet_list_2 = query_for_tweets(user_2_screen_name, user_1_screen_name)
     session['user_1_screen_name'] = user_1_screen_name
     session['user_2_screen_name'] = user_2_screen_name
-    return render_template("list_tweets.html", tweet_list_1 = tweet_list_1, tweet_list_2 = tweet_list_2,
-        user_1 = user_1_screen_name, user_2 = user_2_screen_name)
-
-def strip_leading_ampersand(string):
-    if string[0] == '@':
-        new_string = string[1:]
-        return new_string
-    return string
+    return render_template("list_tweets.html", 
+                            tweet_list_1 = tweet_list_1, 
+                            tweet_list_2 = tweet_list_2,
+                            user_1 = user_1_screen_name, 
+                            user_2 = user_2_screen_name)
 
 @app.route("/analysis")
 def analysis():
@@ -59,20 +60,33 @@ def analysis():
                             user_1 = session['user_1_screen_name'],
                             user_2 = session['user_2_screen_name'])
 
+##### Helper functions #####
+
+def strip_leading_ampersand(string):
+    """Exactly what it says on the tin"""
+    if string[0] == '@':
+        new_string = string[1:]
+        return new_string
+    return string
+
 def rid_analyze(tweet_list):
+    """Performs psychological content analysis using regressive imagery dictionary.
+    Returns sorted list of categories found in a text."""
+
     tweet_text = cat_list_of_tweets(tweet_list)
     summary = en.content.categorise(tweet_text)
     return summary
 
 def cat_list_of_tweets(tweet_list):
+    """Concatenates list of strings into one big string."""
     return ''.join([item.text for item in tweet_list])
 
 
 def query_for_tweets(user_1_screen_name, user_2_screen_name):
-	search_string = "%@" + user_2_screen_name + "%"
-    # will add "in_reply_to_user" to accommodate changed usernames
-	tweet_list = model.session.query(Tweet).filter(or_(Tweet.text.like(search_string), Tweet.to_user_screen_name==user_2_screen_name)).filter(Tweet.from_user_screen_name == user_1_screen_name)
-	return tweet_list
+    """Queries database for @replies and mentions of user_2 in user_1 tweet stream."""
+    search_string = "%@" + user_2_screen_name + "%"
+    tweet_list = model.session.query(Tweet).filter(or_(Tweet.text.like(search_string), Tweet.to_user_screen_name==user_2_screen_name)).filter(Tweet.from_user_screen_name == user_1_screen_name)
+    return tweet_list
 
 if __name__== "__main__":
 	app.run(debug = True)

@@ -1,0 +1,138 @@
+{% extends "layout.html" %}
+{% block body %}
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Streamgraph</title>
+<style>
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: auto;
+  position: relative;
+  width: 960px;
+}
+
+button {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+</style>
+<button onclick="transition()">Update</button>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+
+var n = 20, // number of layers
+    m = 50, // number of samples per layer
+
+    /*
+    d3.layout.stack() constructs a new stack layout with the default offset (zero) and order (null). '
+    The returned layout object is both an object and a function. '
+    That is: you can call the layout like any other function, and the layout has additional methods that change its behavior. 
+    'Like other classes in D3, layouts follow the method chaining pattern where setter methods return the layout itself, allowing multiple setters to be invoked in a concise statement.
+    */
+
+    stack = d3.layout.stack().offset("wiggle"),
+
+  /*
+  array.map(callback[, thisArg]) reates a new array with the results of calling a provided function on every element in this array.
+
+  WTF is a named function expression? Oh Javascript. Le sigh.
+  */
+    layers0 = stack(d3.range(n).map(function() { return bumpLayer(m); })),
+    layers1 = stack(d3.range(n).map(function() { return bumpLayer(m); }));
+
+var width = 960,
+    height = 500;
+
+/*
+d3.scale.linear() constructs a new linear scale with the default domain [0,1] and the default range [0,1]. 
+Thus, the default linear scale is equivalent to the identity function for numbers; 
+for example linear(0.5) returns 0.5.
+*/
+
+var x = d3.scale.linear()
+    .domain([0, m - 1])
+    .range([0, width]);
+
+/*
+array.concat() returns a new array comprised of this array joined with other array(s) and or value(s).
+*/
+
+var y = d3.scale.linear()
+    .domain([0, d3.max(layers0.concat(layers1), function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
+    .range([height, 0]);
+
+var color = d3.scale.linear()
+    .range(["#aad", "#556"]);
+
+var area = d3.svg.area()
+    .x(function(d) { return x(d.x); })
+    .y0(function(d) { return y(d.y0); })
+    .y1(function(d) { return y(d.y0 + d.y); });
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+/*
+d3.selectAll(selector)
+
+Selects all elements that match the specified selector. The elements will be selected in document traversal order (top-to-bottom). If no elements in the current document match the specified selector, returns the empty selection.
+
+d3.selectAll(nodes)
+
+Selects the specified array of elements. This is useful if you already have a reference to nodes, such as d3.selectAll(this.childNodes) within an event listener, or a global such as document.links. The nodes argument doesn't have to be an array, exactly; any pseudo-array that can be coerced into an array (e.g., a NodeList or arguments) will work.
+
+Is selectAll taking a selector, or nodes, as a parameter? I am confuse.
+*/
+
+svg.selectAll("path")
+    .data(layers0)
+  .enter().append("path")
+    .attr("d", area)
+    .style("fill", function() { return color(Math.random()); });
+
+//Probably don't need this for my application.
+function transition() {
+  d3.selectAll("path")
+      .data(function() {
+        var d = layers1;
+        layers1 = layers0;
+        return layers0 = d;
+      })
+    .transition()
+      .duration(2500)
+      .attr("d", area);
+}
+
+// Inspired by Lee Byron's test data generator.
+function bumpLayer(n) {
+
+  function bump(a) {
+    var x = 1 / (.1 + Math.random()),
+        // math.random returns a random number between 1 and 10
+        // x is one divided by (.1 + random)
+        // therefore x is between .9 and .10
+        y = 2 * Math.random() - .5,
+        // y is twice random minus .5
+        // therefore y is max 17.5, min 1.5
+        z = 10 / (.1 + Math.random());
+        // z is ten divided by (.1 + random)
+        // therefore z is max 9. 09, min .52,  
+    for (var i = 0; i < n; i++) {
+      var w = (i / n - y) * z;
+      a[i] += x * Math.exp(-w * w);
+    }
+  }
+
+  var a = [], i;
+  for (i = 0; i < n; ++i) a[i] = 0;
+  for (i = 0; i < 5; ++i) bump(a);
+  return a.map(function(d, i) { return {x: i, y: Math.max(0, d)}; });
+}
+
+</script>
+
+{% endblock %}

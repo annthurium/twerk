@@ -23,54 +23,64 @@ button {
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 
-var n = 20, // number of layers
-    m = 50, // number of samples per layer
+var n = 15, // number of layers
+    m = 25, // number of samples per layer
 
-    /*
-    d3.layout.stack() constructs a new stack layout with the default offset (zero) and order (null). '
-    The returned layout object is both an object and a function. '
-    That is: you can call the layout like any other function, and the layout has additional methods that change its behavior. 
-    'Like other classes in D3, layouts follow the method chaining pattern where setter methods return the layout itself, allowing multiple setters to be invoked in a concise statement.
-    */
+    // d3.layout.stack() creates a values accessor that retrieves the points for each layer
+    stack = d3.layout.stack()
 
-    // creates a values accessor that retrieves the points for each layer
     // .offset("wiggle") minimizes weighted change in slope.
-    stack = d3.layout.stack().offset("wiggle"),
+    // THAT'S WHAT MAKES IT A STREAMGRAPH
+    // OMG I AM FINALLY UNDERSTANDING THIS? MAYBE? MAYBE.
+    .offset("wiggle"),
 
-  /*
-  array.map(callback[, thisArg]) reates a new array with the results of calling a provided function on every element in this array.
+  
+  // layers0 is an array of size n.
+  // Each element in layers0 is an array of size m that contains ({x: i, y: Math.max(0, d)}; });
+  // I think?
 
-  WTF is a named function expression? Oh Javascript. Le sigh.
-  */
+  // layers0 is the current graph
+  // layers1 is the next graph
+    layers0 = stack(d3.range(n)
 
-  // layers0 is a stack with the offset of 
-    layers0 = stack(d3.range(n).map(function() { return bumpLayer(m); })),
-    layers1 = stack(d3.range(n).map(function() { return bumpLayer(m); }));
+      //map calls a function on every value in an array, returns new array containing results
+      .map(function() { 
+        return bumpLayer(m); 
+      })),
+    layers1 = stack(d3.range(n)
+      .map(function() { 
+        return bumpLayer(m); 
+      }));
 
+// width and size of the whole graph
 var width = 960,
     height = 500;
 
-/*
-d3.scale.linear() constructs a new linear scale with the default domain [0,1] and the default range [0,1]. 
-Thus, the default linear scale is equivalent to the identity function for numbers; 
-for example linear(0.5) returns 0.5.
-*/
-
 var x = d3.scale.linear()
+    // input values are min 0, max one less than the total number of samples per layer (m)
     .domain([0, m - 1])
+    // output values are min 0, max width of the whole dang graph
     .range([0, width]);
 
-/*
-array.concat() returns a new array comprised of this array joined with other array(s) and or value(s).
-*/
-
 var y = d3.scale.linear()
-    .domain([0, d3.max(layers0.concat(layers1), function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
+    // input values are min 0, max ... uhh ... I'm confused
+    // max largest y value in this array or the next array?
+    .domain([0, d3.max(layers0.concat(layers1), 
+      function(layer) { 
+        return d3.max(layer, 
+          function(d) { 
+            return d.y0 + d.y; 
+          }); 
+      })
+    ])
+    // input values is min zero, max the highest value in this graph (layers0) or the next graph (layers1)
     .range([height, 0]);
+    // output values are... max height, min 0? I'm confused.
 
 var color = d3.scale.linear()
-    .range(["#aad", "#000", "222"]);
-// .range is an array
+    // what is the middle argument doing? is it the midpoint?
+    .range(["#aad", "#000", "000"]);
+
 var area = d3.svg.area()
     .x(function(d) { return x(d.x); })
     .y0(function(d) { return y(d.y0); })
@@ -81,24 +91,18 @@ var svg = d3.select("body").append("svg")
     .attr("height", height);
 
 /*
-d3.selectAll(selector)
-
-Selects all elements that match the specified selector. The elements will be selected in document traversal order (top-to-bottom). If no elements in the current document match the specified selector, returns the empty selection.
-
-d3.selectAll(nodes)
-
-Selects the specified array of elements. This is useful if you already have a reference to nodes, such as d3.selectAll(this.childNodes) within an event listener, or a global such as document.links. The nodes argument doesn't have to be an array, exactly; any pseudo-array that can be coerced into an array (e.g., a NodeList or arguments) will work.
-
-Is selectAll taking a selector, or nodes, as a parameter? I am confuse.
+Is selectAll taking a selector, or nodes, as a parameter? I think it's taking nodes, because stack is a values accessor
 */
 
 // fills each layer with a color in specified color range
 svg.selectAll("path")
     .data(layers0)
-  .enter().append("path")
+    .enter()
+    .append("path")
     .attr("d", area)
-    .style("fill", function() { return color(Math.random()); });
-
+    .style("fill", function() {
+     return color(Math.random()); 
+   });
 
 //Probably don't need this for my application.
 function transition() {

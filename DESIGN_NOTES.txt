@@ -26,8 +26,10 @@ this can go in Python, not in a database
 
 
 Things that need to happen:
-- create database
-I realized there is a Python wrapper for the Twitter api. I might not have to parse the stupid JSON myself. 
-You can only get 200 statuses per function call. Do I need to worry about API rate limits here?
+- do archive tweets
+- or oauth. FUNZIES.
+- fix session dictionary
+- colors in analysis.html
 
-- write model.py to interface between database and Python
+Questions
+	- where should the function that checks the database to see what's already in there live? stripper? That file doesn't otherwise interface with the database. In order to have stripper interface with the database, I would need to import sqlalchemy. Should I worry about dependencies or weird behavior with regards to module imports?

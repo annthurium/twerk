@@ -15,10 +15,8 @@ Nouns:
 		- username [@whatever] (varchar, 50)
 		- name[Jane Doe] (varchar, 256)
 		- profile_image_url(varchar, 256)
-		- followers(list of ints or characters)
-		- following(list of ints or characters)
-
-
+		# - followers(list of ints or characters)
+		# - following(list of ints or characters)
 
 Things to ponder
 
@@ -27,8 +25,6 @@ Things to ponder
 - Will users have to authorize my application? Depends on API rate limiting, the type of info I need, etc.
 
 - error checking for collision when I import tweets into database
-
-- for @replies to multiple users, how does to_user_id work? Only the first user in the to_user_id field. The easiest way I've found to do this is to search the text of the tweet for "@username". I'm not going to differentiate between replies and mentions, fuck that.
 
 - When a user hits "analyze," I will need to check and see if they are already in the user database.
 	- if they are, I will need to check for new tweets and paginate them into the database. FUNZIES.

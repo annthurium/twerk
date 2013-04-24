@@ -12,14 +12,14 @@
     	
         <script type="text/javascript">
 
-
     // data
     var layers = [
       { 
         "name": "apples",
         "values": [
           { "x": 0, "y":  91},
-          { "x": 1, "y": 290}
+          { "x": 1, "y": 100}//,
+          //{ "x": 2, "y": 55}
         ]
       },
       {  
@@ -28,7 +28,38 @@
           { "x": 0, "y":  9},
           { "x": 1, "y": 49}
         ]
+      },
+      {
+        "name": "grapes",
+        "values": [
+          { "x": 0, "y":  25},
+          { "x": 1, "y": 88}
+        ]
+      },
+      { 
+        "name": "bananaz",
+        "values": [
+          { "x": 0, "y":  91},
+          { "x": 1, "y": 100}//,
+          //{ "x": 2, "y": 55}
+        ]
+      },
+      {  
+        "name": "durian",
+        "values": [
+          { "x": 0, "y":  9},
+          { "x": 1, "y": 49}
+        ]
+      },
+      {
+        "name": "melons",
+        "values": [
+          { "x": 0, "y":  25},
+          { "x": 1, "y": 88}
+        ]
       }
+
+
     ];
 
 var m = 2; // number of samples per layer
@@ -40,6 +71,7 @@ var width = 960,
 // creates a values accessor for each layer
 var stack = d3.layout.stack()
     .offset("wiggle")
+
     .values(function(d) { return d.values; });
 
 
@@ -60,9 +92,9 @@ var area = d3.svg.area()
     .attr("width", width)
     .attr("height", height);
 
-var color = d3.scale.linear()
+var color = d3.scale.category20()
     // what is the middle argument doing? is it the midpoint?
-    .range(["#aad", "#000", "000"]);
+    //.range(["#aad", "#000", "000"]);
 
 /*
 var area = d3.svg.area()

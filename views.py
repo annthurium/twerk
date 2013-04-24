@@ -32,10 +32,17 @@ def about():
 def contact():
     return render_template("contact.html")
 
+# Easter egg
+@app.route("/georgia_okeefe")
+def georgia_okeefe():
+    return render_template("georgia_okeefe.html")
+
 @app.route("/list_tweets", methods=["POST", "GET"])
 def list_tweets():
     user_1_screen_name = strip_leading_ampersand(str(request.form['user_1_screen_name']))
     user_2_screen_name = strip_leading_ampersand(str(request.form['user_2_screen_name']))
+    # check to see if this data already exists in session
+    # if not, send them back to the index page to enter their data
     seed.get_tweets(user_1_screen_name)
     seed.get_tweets(user_2_screen_name)
     tweet_list_1 = query_for_tweets(user_1_screen_name, user_2_screen_name)

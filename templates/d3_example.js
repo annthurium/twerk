@@ -28,9 +28,9 @@ function GenRandomData(num_layers, num_points) {
   x_transform = d3.scale.linear()
     .domain([0, num_points])
     .range([0, WIDTH]);
-  y_transform = d3.scale.linear()
-    .range([HEIGHT / num_layers, 0]);
-
+  c_transform = d3.scale.linear()
+    .domain([0, num_points / 2, num_points])
+    .range([0, 1.0, 0.0]);
   var layers = [];
   for (var i = 0; i != num_points; ++i) {
     var x = x_transform(i);
@@ -39,6 +39,8 @@ function GenRandomData(num_layers, num_points) {
         // On the first point, add a new layer.
         layers.push([]);
       }
+    var y_transform = d3.scale.linear()
+      .range([c_transform(i) * HEIGHT / num_layers, 0]);
 
       layers[j].push(P(
         x,
@@ -50,7 +52,7 @@ function GenRandomData(num_layers, num_points) {
 }
 
 
-DATA = GenRandomData(10, 50);
+DATA = GenRandomData(10, 20);
 
 // creates a values accessor for each layer
 var stacker = d3.layout.stack()

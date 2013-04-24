@@ -32,4 +32,3 @@ Things that need to happen:
 - colors in analysis.html
 
 Questions
-	- where should the function that checks the database to see what's already in there live? stripper? That file doesn't otherwise interface with the database. In order to have stripper interface with the database, I would need to import sqlalchemy. Should I worry about dependencies or weird behavior with regards to module imports?

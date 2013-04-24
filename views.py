@@ -32,6 +32,11 @@ def about():
 def contact():
     return render_template("contact.html")
 
+# Easter egg
+@app.route("/georgia_okeefe")
+def georgia_okeefe():
+    return render_template("georgia_okeefe.html")
+
 @app.route("/list_tweets", methods=["POST", "GET"])
 def list_tweets():
     user_1_screen_name = strip_leading_ampersand(str(request.form['user_1_screen_name']))

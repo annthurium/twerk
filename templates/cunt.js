@@ -7,8 +7,19 @@ function DrawRandomCunt() {
   // We're flipping WIDTH and HEIGHT here, because we're going to
   // plot this sideways.
   labia_data = GenRandomCunt(10, 20, HEIGHT, WIDTH);
+/*
+  labia_data = [
+         [ {x: 0, y: 0.0},
+           {x: 25, y: 23.3},
+           {x: 50, y: 83.2},
+           {x: 75, y: 1.1},
+           {x: 100, y: 0.0}
+         ]
+      ]
+    */
   DrawCunt(labia_data);
 }
+
 
 /**
  * GenRandomCunt generates random data to be plotted as a stream

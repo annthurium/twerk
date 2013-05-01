@@ -6,7 +6,9 @@ from sqlalchemy import or_
 import model
 import seed
 import en
-import calendar
+
+# for graphing date and time
+import collections
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
@@ -97,26 +99,56 @@ def make_graph():
     year_range = range(start_year, end_year+1)
     for year in year_range:
         for month in months:
-            d_string = month + "-" + str(year)
+            d_string = str(year) + "-" + month
             month_year_list.append(d_string)
 
-    fields = ['x', 'y']
-    tweets_over_time = dict.fromkeys(month_year_list)
+    tweets_over_time = dict.fromkeys(month_year_list, 0)
 
-     fmt = '%m-%Y'
+     fmt = '%Y-%m' # This will make sorting easier, I think?
 
     start_month = earliest_date.month
     start_year = earliest_date.year
-    temp_list = []
-    real_list = []
-    for index, item in enumerate(tweet_list_1):
+    for item tweet_list_1:
         d_string = item.time_stamp.strftime(fmt)
-        if tweets_over_time[d_string] is None:
+        if tweets_over_time[d_string] == 0:
             tweets_over_time[d_string] = item.text
         else:
             # this seems horribly inefficient, there must be a better way
             tweets_over_time[d_string = new_dictionary[d_string] + " " + item.text
         
+    # so now we have a dict of date value, tweet text
+    for key in tweets_over_time:
+        if tweets_over_time[key] != 0:
+            tweets_over_time[key] = en.content.categorise(tweets_over_time[key])
+
+    # now we have a dictionary of month:RID score items
+
+    # compressing data in dictionary to make graphing easier
+    # I'll modify this later to make a fancier graph
+
+    for key in tweets_over_time:
+        primary = 0
+        secondary = 0
+        emotions = 0
+        if tweets_over_time[key] != 0:
+            for item in tweets_over_time[key]:
+                if item.type == "emotions":
+                    emotions += item.count
+                elif item.type == "secondary":
+                    secondary += item.count
+                else:
+                    primary += item.count
+        nested_dictionary = {'primary':primary, 'secondary':secondary, 'emotions':emotions}
+        tweets_over_time[key] = nested_dictionary
+    # now we have a dictionary of month:{primary:count, secondary:count, emotions:count}
+
+    # come time to sort the dict
+    ordered_tweets_over_time = collections.OrderedDict(sorted(d.items()))
+
+    num_months = len(month_year_list)
+    fields  = ['x', 'y']
+
+    # we want the key
 
 
     # This is doing it the bucket way

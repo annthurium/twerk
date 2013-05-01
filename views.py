@@ -7,7 +7,7 @@ import model
 import seed
 import en
 import calendar
-from datetime import datetime
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.secret_key = "dumbass_horse_battery_staple_FOREVAR_AND_EVAR"
@@ -73,15 +73,47 @@ def analysis():
 @app.route("/graph")
 def make_graph():
     tweet_list_1 = query_for_tweets(session['user_1_screen_name'], session['user_2_screen_name'])
-    #tweet_list_2 = query_for_tweets(session['user_2_screen_name'], session['user_1_screen_name'])
+    tweet_list_2 = query_for_tweets(session['user_2_screen_name'], session['user_1_screen_name'])
     list_1_len = count_list_of_tweets(tweet_list_1)
 
-    NUM_POINTS = 10
+    # find earliest tweet in either list
+    # this code assumes tweets are ordered from least recent to most recent
+    # and they should be, because the database orders tweets sequentially by id number
+    list_1_start_date = tweet_list_1[0].time_stamp
+    list_2_start_date = tweet_list_2[0].time_stamp
 
-    # list_1_len will need to be rounded so as to ensure same number of points but I'll worry about that later
-    n = list_1_len / NUM_POINTS
+    earliest_date = get_earliest_date(list_1_start_date, list_2_start_date)
 
-    tweet_text_1 = make_sub_list(tweet_list_1, NUM_POINTS, list_1_len)
+    # find latest tweet in either list
+    list_2_end_date = tweet_list_2[-1].time_stamp
+    list_2_end_date = tweet_list_2[-1].time_stamp
+
+    latest_date = get_latest_date(list_1_end_date, list_2_end_date)
+
+    month_year_list = []
+    months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+    start_year = earliest_date.year
+    end_year = latest_date.year
+    year_range = range(start_year, end_year+1)
+    for year in year_range:
+        for month in months:
+            d_string = month + "-" + str(year)
+            month_year_list.append(d_string)
+    
+    # fmt = '%m-%Y'
+    # for item in tweet_list_1:
+    #     d_string - item.time_stamp.strftime(fmt)
+    #     if d_string not in month_year_list:
+    #         month_year_list.append(d_string)
+    # 
+
+
+    # This is doing it the bucket way
+    # NUM_POINTS = 10
+    # # list_1_len will need to be rounded so as to ensure same number of points but I'll worry about that later
+    # n = list_1_len / NUM_POINTS
+
+    # #tweet_text_1 = make_sub_list(tweet_list_1, NUM_POINTS, list_1_len)
 
 
     primary = []
@@ -103,6 +135,20 @@ def make_graph():
 
 
 ##### Helper functions #####
+
+def get_earliest_date(date1, date2):
+    """ Returns earlier of 2 dates."""
+    if date1 < date2:
+        return date1
+    else:
+        return date2
+
+def get_latest_date(date1, date2):
+    """ Returns latest of 2 dates."""
+    if date1 > date2:
+        return date1
+    else:
+        return date2
 
 def make_sub_list(list_of_tweets, n, list_length):
     """Divides list of tweets into length of size n.

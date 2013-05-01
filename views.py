@@ -99,13 +99,24 @@ def make_graph():
         for month in months:
             d_string = month + "-" + str(year)
             month_year_list.append(d_string)
-    
-    # fmt = '%m-%Y'
-    # for item in tweet_list_1:
-    #     d_string - item.time_stamp.strftime(fmt)
-    #     if d_string not in month_year_list:
-    #         month_year_list.append(d_string)
-    # 
+
+    fields = ['x', 'y']
+    tweets_over_time = dict.fromkeys(month_year_list)
+
+     fmt = '%m-%Y'
+
+    start_month = earliest_date.month
+    start_year = earliest_date.year
+    temp_list = []
+    real_list = []
+    for index, item in enumerate(tweet_list_1):
+        d_string = item.time_stamp.strftime(fmt)
+        if tweets_over_time[d_string] is None:
+            tweets_over_time[d_string] = item.text
+        else:
+            # this seems horribly inefficient, there must be a better way
+            tweets_over_time[d_string = new_dictionary[d_string] + " " + item.text
+        
 
 
     # This is doing it the bucket way
@@ -136,6 +147,8 @@ def make_graph():
 
 ##### Helper functions #####
 
+
+##### These are for the date method of showing tweets over time.
 def get_earliest_date(date1, date2):
     """ Returns earlier of 2 dates."""
     if date1 < date2:
@@ -150,6 +163,8 @@ def get_latest_date(date1, date2):
     else:
         return date2
 
+
+##### These are for the "bucket" method of showing tweets over time.
 def make_sub_list(list_of_tweets, n, list_length):
     """Divides list of tweets into length of size n.
     Returns concatented text from list of tweets"""
@@ -161,6 +176,8 @@ def count_list_of_tweets(list_of_tweets):
     for item in list_of_tweets:
         count += 1
     return count
+
+
 
 def strip_leading_ampersand(string):
     """Exactly what it says on the tin"""

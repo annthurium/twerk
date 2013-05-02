@@ -1,20 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>D3 Test</title>
-        <script type="text/javascript" src="http://d3js.org/d3.v3.js"></script>
-        <style type="text/css">
-    </style>
+{% extends "layout.html" %}
+{% block body %}
 
-    </head>
-    <body>
-      
-        <script type="text/javascript">
+<style>
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: auto;
+  position: relative;
+  width: 960px;
+}
+
+button {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+</style>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
 
     // x is time
     // y is value
     // data
+
+    /*
     var layers = [
     
       { 
@@ -46,10 +55,16 @@
         ]
       },
     ];
+*/
 
-var m = 4; // number of samples per layer
+var layers = {{ data|safe }}
+
+
+var m = layers[0].values.length // number of samples per layer
+// this will vary by graph, but how do I show that?
+
 var width = 1000,
-    height = 500,
+    height = 1000,
     mx = m - 1,
     my = 350;
 
@@ -97,5 +112,5 @@ svg.selectAll("path")
       return d.name; 
     });
 </script>
-</body>
-</html>
+
+{% endblock %}

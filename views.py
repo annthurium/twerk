@@ -1,11 +1,13 @@
 ##### Flask views live here (in all their glory.)
 
-from flask import Flask, render_template, redirect, request, url_for, flash, session, g
+from flask import Flask, render_template, redirect, request, url_for, flash, session, g, jsonify
 from model import session as db_session, User, Tweet
 from sqlalchemy import or_
 import model
 import seed
 import en
+import itertools
+import json
 
 # for graphing date and time
 import collections
@@ -72,8 +74,45 @@ def analysis():
                             user_2 = session['user_2_screen_name'])
 
 
+ScoreKey = collections.namedtuple('Score', ['name', 'type'])
+AnalyzedTweet = collections.namedtuple('AnalyzedTweet', ['ts', 'id', 'summary', 'text', 'from_user'])
+LayerKey = collections.namedtuple('LayerKey', ['from_user', 'name', 'type'])
+Point = collections.namedtuple('Point', ['x', 'y'])
 @app.route("/graph")
 def make_graph():
+    tweet_list_1 = query_for_tweets(session['user_1_screen_name'], session['user_2_screen_name'])
+    tweet_list_2 = query_for_tweets(session['user_2_screen_name'], session['user_1_screen_name'])
+    tweet_analyses = []
+
+    layers = {}
+    for tweet in itertools.chain(tweet_list_1, tweet_list_2):
+        summary = en.content.categorise(tweet.text)
+        all_summaries = {}
+        for item in summary:
+            all_summaries[ScoreKey(name = item.name, 
+                                   type = item.type)] = item.count
+            layers[LayerKey(from_user=tweet.from_user_screen_name, name=item.name, type=item.type)] = []
+        tweet_analyses.append(AnalyzedTweet(ts = tweet.time_stamp,
+                                            id = tweet.id,
+                                            summary = all_summaries,
+                                            text = tweet.text,
+                                            from_user = tweet.from_user_screen_name))
+
+    sorted_tweets = sorted(tweet_analyses, key=lambda x:x.ts)
+    for tweet in sorted_tweets:
+        for key in layers:
+            try:
+                layers[key].append(tweet.summary[ScoreKey(key.name, key.type)])
+            except KeyError:
+                layers[key].append(0)
+
+    json_layers = []
+    for layer in layers:
+        json_layers.append({'name': '%s: %s, %s' % (layer.from_user, layer.type, layer.name),
+                            'values': [{'x': x, 'y': y} for x, y in enumerate(layers[layer])]})
+    return render_template("argh.html", data=json.dumps(json_layers))
+
+def old_make_graph():
     tweet_list_1 = query_for_tweets(session['user_1_screen_name'], session['user_2_screen_name'])
     tweet_list_2 = query_for_tweets(session['user_2_screen_name'], session['user_1_screen_name'])
     list_1_len = count_list_of_tweets(tweet_list_1)
@@ -84,116 +123,146 @@ def make_graph():
     list_1_start_date = tweet_list_1[0].time_stamp
     list_2_start_date = tweet_list_2[0].time_stamp
 
-    earliest_date = get_earliest_date(list_1_start_date, list_2_start_date)
+    earliest_date = min(list_1_start_date, list_2_start_date)
 
     # find latest tweet in either list
+    list_1_end_date = tweet_list_2[-1].time_stamp
     list_2_end_date = tweet_list_2[-1].time_stamp
-    list_2_end_date = tweet_list_2[-1].time_stamp
 
-    latest_date = get_latest_date(list_1_end_date, list_2_end_date)
+    latest_date = max(list_1_end_date, list_2_end_date)
 
-    month_year_list = []
-    months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
-    start_year = earliest_date.year
-    end_year = latest_date.year
-    year_range = range(start_year, end_year+1)
-    for year in year_range:
-        for month in months:
-            d_string = str(year) + "-" + month
-            month_year_list.append(d_string)
 
-    tweets_over_time = dict.fromkeys(month_year_list, 0)
+    def tweets_by_month(tweets):
+        month = None
+        batch = []
+        for tweet in tweets:
+            if month != tweet.time_stamp.month:
+                if batch: # if batch is not empty
+                    yield batch
+                month = tweet.time_stamp.month
+                batch = []
+            batch.append(tweet)
 
-     fmt = '%Y-%m' # This will make sorting easier, I think?
+    for batch in tweets_by_month(tweet_list_1):
+        for tweet in batch:
+            print tweet.time_stamp
+        print "\n"
 
-    start_month = earliest_date.month
-    start_year = earliest_date.year
-    for item tweet_list_1:
-        d_string = item.time_stamp.strftime(fmt)
-        if tweets_over_time[d_string] == 0:
-            tweets_over_time[d_string] = item.text
-        else:
-            # this seems horribly inefficient, there must be a better way
-            tweets_over_time[d_string = new_dictionary[d_string] + " " + item.text
+    return
+    # month_year_list = []
+    # months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+    # start_year = earliest_date.year
+    # end_year = latest_date.year
+    # year_range = range(start_year, end_year+1)
+    # for year in year_range:
+    #     for month in months:
+    #         d_string = str(year) + "-" + month
+    #         month_year_list.append(d_string)
+
+
+    # # should I be using dictionaries for this?
+    # # this should probably just be a list
+    # # or should I write some kind of container class? Decisions decisions
+    # tweets_over_time = dict.fromkeys(month_year_list, 0)
+
+    #  fmt = '%Y-%m' # This will make sorting easier, I think?
+
+    # start_month = earliest_date.month
+    # start_year = earliest_date.year
+    # for item tweet_list_1:
+    #     d_string = item.time_stamp.strftime(fmt)
+    #     if tweets_over_time[d_string] == 0:
+    #         tweets_over_time[d_string] = item.text
+    #     else:
+    #         # this seems horribly inefficient, there must be a better way
+    #         tweets_over_time[d_string = new_dictionary[d_string] + " " + item.text
         
-    # so now we have a dict of date value, tweet text
-    for key in tweets_over_time:
-        if tweets_over_time[key] != 0:
-            tweets_over_time[key] = en.content.categorise(tweets_over_time[key])
+    # # so now we have a dict of date value, tweet text
+    # for key in tweets_over_time:
+    #     if tweets_over_time[key] != 0:
+    #         tweets_over_time[key] = en.content.categorise(tweets_over_time[key])
 
-    # now we have a dictionary of month:RID score items
+    # # now we have a dictionary of month:RID score items
 
-    # compressing data in dictionary to make graphing easier
-    # I'll modify this later to make a fancier graph
+    # # compressing data in dictionary to make graphing easier
+    # # I'll modify this later to make a fancier graph
 
-    for key in tweets_over_time:
-        primary = 0
-        secondary = 0
-        emotions = 0
-        if tweets_over_time[key] != 0:
-            for item in tweets_over_time[key]:
-                if item.type == "emotions":
-                    emotions += item.count
-                elif item.type == "secondary":
-                    secondary += item.count
-                else:
-                    primary += item.count
-        nested_dictionary = {'primary':primary, 'secondary':secondary, 'emotions':emotions}
-        tweets_over_time[key] = nested_dictionary
-    # now we have a dictionary of month:{primary:count, secondary:count, emotions:count}
+    # for key in tweets_over_time:
+    #     primary = 0
+    #     secondary = 0
+    #     emotions = 0
+    #     if tweets_over_time[key] != 0:
+    #         for item in tweets_over_time[key]:
+    #             if item.type == "emotions":
+    #                 emotions += item.count
+    #             elif item.type == "secondary":
+    #                 secondary += item.count
+    #             else:
+    #                 primary += item.count
+    #     nested_dictionary = {'primary':primary, 'secondary':secondary, 'emotions':emotions}
+    #     tweets_over_time[key] = nested_dictionary
+    # # now we have a dictionary of month:{primary:count, secondary:count, emotions:count}
 
-    # come time to sort the dict
-    ordered_tweets_over_time = collections.OrderedDict(sorted(d.items()))
+    # # come time to sort the dict
+    # ordered_tweets_over_time = collections.OrderedDict(sorted(ordered_tweets_over_time.items()))
 
-    num_months = len(month_year_list)
-    fields  = ['x', 'y']
+    # num_months = len(month_year_list)
 
-    # we want the key
+    # # I don't actually need a dictionary
+    # # flask jsonify extension takes named parameters
+
+    # primary = []
+    # secondary = []
+    # emo = []
+    # x = 0
+    # for key in ordered_tweets_over_time:
+    #     primary.append({'x': x, 'y': ordered_tweets_over_time[key]['primary']})
+    #     secondary.append({'x': x, 'y': ordered_tweets_over_time[key]['secondary']})
+    #     emo.append({'x': x, 'y': ordered_tweets_over_time[key]['emotions']})
+    #     x += 1
+    # layers = [
+    #   {'name': 'primary', 'values': primary},
+    #   {'name': 'secondary', 'values': secondary},
+    #   {'name': 'emotional', 'values': emo}
+    # ]
+
+    # # now we have to sort it again, because dictionaries. Sigh.
 
 
-    # This is doing it the bucket way
-    # NUM_POINTS = 10
-    # # list_1_len will need to be rounded so as to ensure same number of points but I'll worry about that later
-    # n = list_1_len / NUM_POINTS
-
-    # #tweet_text_1 = make_sub_list(tweet_list_1, NUM_POINTS, list_1_len)
+    # # sorting second layer:
+    # for val in layers:
+    #     for key in val:
+    #         val[key] = collections.OrderedDict(sorted(val.items()))
 
 
-    primary = []
-    secondary = []
-    emotions = []
 
-    # break list of tweets up into sub lists
+    # # This is doing it the bucket way
+    # # NUM_POINTS = 10
+    # # # list_1_len will need to be rounded so as to ensure same number of points but I'll worry about that later
+    # # n = list_1_len / NUM_POINTS
 
-    for count, item in enumerate(tweet_list_1):
-        new_list
+    # # #tweet_text_1 = make_sub_list(tweet_list_1, NUM_POINTS, list_1_len)
 
-    # run rid analysis on sub list
 
-    keys = ['primary', 'secondary', 'emotions']
-    dictionary = dict.fromkeys(keys, 0)
-    # Data for graph lives in NESTED DICTIONARIES. 
-    # KEY is primary/secondary/emotions, 
+    # primary = []
+    # secondary = []
+    # emotions = []
+
+    # # break list of tweets up into sub lists
+
+    # for count, item in enumerate(tweet_list_1):
+    #     new_list
+
+    # # run rid analysis on sub list
+
+    # keys = ['primary', 'secondary', 'emotions']
+    # dictionary = dict.fromkeys(keys, 0)
+    # # Data for graph lives in NESTED DICTIONARIES. 
+    # # KEY is primary/secondary/emotions, 
     # values are a list of dictionaries (x is key, y is value)(x is key, y is value)
 
 
 ##### Helper functions #####
-
-
-##### These are for the date method of showing tweets over time.
-def get_earliest_date(date1, date2):
-    """ Returns earlier of 2 dates."""
-    if date1 < date2:
-        return date1
-    else:
-        return date2
-
-def get_latest_date(date1, date2):
-    """ Returns latest of 2 dates."""
-    if date1 > date2:
-        return date1
-    else:
-        return date2
 
 
 ##### These are for the "bucket" method of showing tweets over time.

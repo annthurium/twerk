@@ -1,56 +1,53 @@
-{% extends "layout.html" %}
 {% block body %}
+
+
+{% for i in range(num_tweets) %}
+  <div class="tweet" style="left: {{ 50 * i }}px">
+    {{ tweet_list[i].text }}
+  </div>
+{% endfor %}
 
 <style>
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  margin: auto;
   position: relative;
-  width: 960px;
+  padding: 0;
 }
 
+table {
+  table-layout: fixed;
+  width: {{ 50 * num_tweets }}px;
+}
+
+td {
+  width: 250px;
+  height: 50px;
+  font-size: 8pt;
+  -webkit-transform-origin: left;
+  transform-origin: left;
+  -webkit-transform: rotate(90deg);
+}
+
+svg {
+  margin-top: 25%;
+}
+
+.tweet {
+  position: absolute;
+  width: 250px;
+  height: 50px;
+  line-height: 1em;
+  font-size: 10pt;
+  text-align: right;
+  top: 10px;
+  -webkit-transform-origin: left;
+  -webkit-transform: rotate(90deg);
+}
 
 </style>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 
-    // x is time
-    // y is value
-    // data
-
-    /*
-    var layers = [
-    
-      { 
-        "name": "primary",
-        "values": [
-          { "x": 0, "y":  91},
-          { "x": 1, "y": 290},
-          { "x": 2, "y": 100},
-          { "x": 3, "y": 80}
-        ]
-      },
-      
-      {  
-        "name": "secondary",
-        "values": [
-          { "x": 0, "y":  9},
-          { "x": 1, "y": 49},
-          { "x": 2, "y": 100},
-          { "x": 3, "y": 120}
-        ]
-      },
-      {  
-        "name": "emotions",
-        "values": [
-          { "x": 0, "y":  9},
-          { "x": 1, "y": 49},
-          { "x": 2, "y": 100},
-          { "x": 3, "y": 120}
-        ]
-      },
-    ];
-*/
 
 var layers = {{ data|safe }}
 
@@ -59,17 +56,21 @@ var m = layers[0].values.length // number of samples per layer
 // this will vary by graph, but how do I show that?
 
 var width = 50 * m,
-    height = 1000;
+    height = window.innerHeight / 2;
+
+if (width < window.innerWidth) {
+  width = window.innerWidth;
+}
 
 // creates a values accessor for each layer
 var stack = d3.layout.stack()
-    .offset("wiggle")
+    .offset("silhouette")
     .values(function(d) { return d.values; });
 
 stackedLayers = stack(layers);
 
 var xScale = d3.scale.linear()
-    .domain([0, m])
+    .domain([1, m - 2])
     .range([0, width]);
 
 var yScale = d3.scale.linear()
@@ -94,16 +95,13 @@ var area = d3.svg.area()
     .attr("width", width)
     .attr("height", height);
 
-var color = d3.scale.linear()
-    // what is the middle argument doing? is it the midpoint?
-    .range(["#aad", "#609", "e0f"]);
+var firstUser = null;
 
-/*
-var area = d3.svg.area()
-    .x(function(d) { return x(d.x); })
-    .y0(function(d) { return y(d.y0); })
-    .y1(function(d) { return y(d.y0  d.y); });
-    */
+var userColor1 = d3.scale.linear()
+    .range(["#240", "#2f0"]);
+
+var userColor2 = d3.scale.linear()
+    .range(["#640", "#fe0"]);
 
 svg.selectAll("path")
   .data(stackedLayers)
@@ -112,8 +110,15 @@ svg.selectAll("path")
     .attr("d", function(d) {
       return area(d.values);
     })
-  .style("fill", function() { 
-    return color(Math.random()); 
+  .style("fill", function(d) { 
+    if (firstUser == null) {
+      firstUser = d.username;
+    }
+    if (d.username == firstUser) {
+      return userColor1(Math.random());
+    } else {
+      return userColor2(Math.random());
+    }
   })
   .append("title")
     .text(function(d) { 

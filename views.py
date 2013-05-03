@@ -111,8 +111,12 @@ def make_graph():
     json_layers = []
     for layer in layers:
         json_layers.append({'name': '%s: %s, %s' % (layer.from_user, layer.type, layer.name),
+                            'username': layer.from_user,
                             'values': [{'x': x, 'y': y} for x, y in enumerate(layers[layer])]})
-    return render_template("graph.html", data=json.dumps(json_layers))
+    return render_template("graph.html", 
+        data=json.dumps(json_layers),
+        tweet_list = sorted_tweets,
+        num_tweets=len(sorted_tweets))
 
 def old_make_graph():
     tweet_list_1 = query_for_tweets(session['user_1_screen_name'], session['user_2_screen_name'])

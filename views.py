@@ -91,7 +91,7 @@ def make_graph():
         all_summaries = {}
         for item in summary:
             all_summaries[ScoreKey(name = item.name, 
-                                   type = item.type)] = item.count
+                                   type = item.type)] = item.count 
             layers[LayerKey(from_user=tweet.from_user_screen_name, name=item.name, type=item.type)] = []
         tweet_analyses.append(AnalyzedTweet(ts = tweet.time_stamp,
                                             id = tweet.id,
@@ -106,6 +106,7 @@ def make_graph():
                 layers[key].append(tweet.summary[ScoreKey(key.name, key.type)])
             except KeyError:
                 layers[key].append(0)
+    #sorted_layers = sorted(layers.keys(), key=lambda k:sum(layers[k]))
 
     json_layers = []
     for layer in layers:

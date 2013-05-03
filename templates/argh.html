@@ -9,12 +9,6 @@ body {
   width: 960px;
 }
 
-button {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-}
-
 </style>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
@@ -22,8 +16,8 @@ button {
     // x is time
     // y is value
     // data
-
-    /*
+/*
+    
     var layers = [
     
       { 
@@ -55,18 +49,52 @@ button {
         ]
       },
     ];
+
+var m = 4
 */
+
 
 var layers = {{ data|safe }}
 
-
 var m = layers[0].values.length // number of samples per layer
-// this will vary by graph, but how do I show that?
 
-var width = 1000,
-    height = 1000,
+// width and height got flipped somehow? Find and fix this.
+var width = 900,
+    height = 500,
     mx = m - 1,
     my = 350;
+
+var xScale = d3.scale.linear()
+				.domain([0, layers[0].values.length])
+				.range([0, width]);
+
+// create array with sum of y values for each x point?
+
+/*
+function findRange(layers) {
+	var count = Array(m)
+	for (var i = 0; i < m; i++) {
+		count[i] = 0
+	}
+
+	for (var i = 0; i < m; i++) {
+		for (var j = 0; j < m; j++) {
+			count[j] += layer[i].values[j] 
+		}
+	}
+	var value = count[0]
+	for (var i = 1; i < m; i++) {
+		if count[i] > value: {
+			value = count[i]
+		}
+	}
+	return value
+}
+*/
+
+var yScale = d3.scale.linear()
+                     .domain([0, d3.max(layers.values, function(d) {return d.y})])
+                     .range([0, height]);
 
 // creates a values accessor for each layer
 var stack = d3.layout.stack()
@@ -94,15 +122,15 @@ var color = d3.scale.linear()
 var area = d3.svg.area()
     .x(function(d) { return x(d.x); })
     .y0(function(d) { return y(d.y0); })
-    .y1(function(d) { return y(d.y0  d.y); });
-    */
+    //.y1(function(d) { return y(d.y0  d.y); });
+*/
 
 svg.selectAll("path")
     .data(stack(layers))
   .enter()
   .append("path")
     .attr("d", function(d) {
-      return area(d.values);
+      return area(d.values); //
     })
   .style("fill", function() { 
     return color(Math.random()); 

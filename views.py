@@ -73,46 +73,66 @@ def analysis():
                             user_1 = session['user_1_screen_name'],
                             user_2 = session['user_2_screen_name'])
 
-
+# creating named tuple classes to hold our data
 ScoreKey = collections.namedtuple('Score', ['name', 'type'])
 AnalyzedTweet = collections.namedtuple('AnalyzedTweet', ['ts', 'id', 'summary', 'text', 'from_user'])
 LayerKey = collections.namedtuple('LayerKey', ['from_user', 'name', 'type'])
 Point = collections.namedtuple('Point', ['x', 'y'])
+
 @app.route("/graph")
 def make_graph():
+
     tweet_list_1 = query_for_tweets(session['user_1_screen_name'], session['user_2_screen_name'])
     tweet_list_2 = query_for_tweets(session['user_2_screen_name'], session['user_1_screen_name'])
     tweet_analyses = []
 
     layers = {}
     for tweet in itertools.chain(tweet_list_1, tweet_list_2):
+        # summary is a sorted list of RID score items
         summary = en.content.categorise(tweet.text)
+        # put the summary data in a dictionary (all_summaries) for easy access
         all_summaries = {}
         for item in summary:
             all_summaries[ScoreKey(name = item.name, 
                                    type = item.type)] = item.count
+            # layers is an instance of the LayerKey class (named tuple)
             layers[LayerKey(from_user=tweet.from_user_screen_name, name=item.name, type=item.type)] = []
+        # tweet_analyses is a list of AnalyzedTweets, which are named tuples
         tweet_analyses.append(AnalyzedTweet(ts = tweet.time_stamp,
                                             id = tweet.id,
                                             summary = all_summaries,
                                             text = tweet.text,
                                             from_user = tweet.from_user_screen_name))
-
+    # sorting tweet analyses by timestamp
     sorted_tweets = sorted(tweet_analyses, key=lambda x:x.ts)
     for tweet in sorted_tweets:
         for key in layers:
+            # if key exists, append tweet.summary and ScoreKey(named tuple) as a value
             try:
                 layers[key].append(tweet.summary[ScoreKey(key.name, key.type)])
+            
+            # if the key doesn't exist, append the key into layers with a value of 0
             except KeyError:
                 layers[key].append(0)
 
+    # now we need the data as a list, formatted for json
     json_layers = []
+
+
     for layer in layers:
         json_layers.append({'name': '%s: %s, %s' % (layer.from_user, layer.type, layer.name),
                             'values': [{'x': x, 'y': y} for x, y in enumerate(layers[layer])]})
+    print json_layers[:2]
     return render_template("argh.html", data=json.dumps(json_layers))
 
-def old_make_graph():
+
+
+
+
+
+
+
+def old_make_graph_had_a_farm():
     tweet_list_1 = query_for_tweets(session['user_1_screen_name'], session['user_2_screen_name'])
     tweet_list_2 = query_for_tweets(session['user_2_screen_name'], session['user_1_screen_name'])
     list_1_len = count_list_of_tweets(tweet_list_1)

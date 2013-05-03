@@ -116,6 +116,8 @@ def make_graph():
     return render_template("graph.html", 
         data=json.dumps(json_layers),
         tweet_list = sorted_tweets,
+        user1=session['user_1_screen_name'],
+        user2=session['user_2_screen_name'],
         num_tweets=len(sorted_tweets))
 
 def old_make_graph():

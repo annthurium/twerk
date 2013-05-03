@@ -1,47 +1,47 @@
+<head>
+  <link href='http://fonts.googleapis.com/css?family=Quicksand:300,400,700' rel='stylesheet' type='text/css'></link>
+</head>
+
 {% block body %}
 
-
 {% for i in range(num_tweets) %}
-  <div class="tweet" style="left: {{ 50 * i }}px">
+  {% if tweet_list[i].from_user == user1 %}
+    <div class="tweet user1" style="top: {{ 50 * i }}px">
+  {% else %}
+    <div class="tweet user2" style="top: {{ 50 * i }}px">
+  {% endif %}
     {{ tweet_list[i].text }}
   </div>
 {% endfor %}
 
 <style>
 body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: 'Quicksand', "Helvetica Neue", Helvetica, Arial, sans-serif;
   position: relative;
   padding: 0;
-}
-
-table {
-  table-layout: fixed;
-  width: {{ 50 * num_tweets }}px;
-}
-
-td {
-  width: 250px;
-  height: 50px;
-  font-size: 8pt;
-  -webkit-transform-origin: left;
-  transform-origin: left;
-  -webkit-transform: rotate(90deg);
+  margin: 0;
+  color: #eee;
+  background: #222;
 }
 
 svg {
-  margin-top: 25%;
+  margin-top: 0;
+  margin-left: 50%;
 }
 
 .tweet {
   position: absolute;
-  width: 250px;
+  width: 400px;
   height: 50px;
-  line-height: 1em;
+  line-height: 1.1em;
   font-size: 10pt;
   text-align: right;
-  top: 10px;
-  -webkit-transform-origin: left;
-  -webkit-transform: rotate(90deg);
+  left: 20%;
+  font-weight: 300;
+}
+
+.tweet.user2 {
+  color: #aaf;
 }
 
 </style>
@@ -57,10 +57,6 @@ var m = layers[0].values.length // number of samples per layer
 
 var width = 50 * m,
     height = window.innerHeight / 2;
-
-if (width < window.innerWidth) {
-  width = window.innerWidth;
-}
 
 // creates a values accessor for each layer
 var stack = d3.layout.stack()
@@ -82,18 +78,25 @@ var yScale = d3.scale.linear()
   ])
     .range([height, 0]);
     
-
+/*
 var area = d3.svg.area()
     .x(function(d) { return xScale(d.x) })
     // y0 is the baseline value
     .y0(function(d) { return yScale(d.y0); })
     .y1(function(d) { return yScale(d.y + d.y0);})
     .interpolate('basis-open');
+    */
+
+var area = d3.svg.area()
+    .x0(function(d) { return yScale(d.y0); })
+    .x1(function(d) { return yScale(d.y0 + d.y); })
+    .y(function(d) { return xScale(d.x); })
+    .interpolate('basis');  // this is important for a smooth cunt.
 
   var svg = d3.select("body")
   .append("svg")
-    .attr("width", width)
-    .attr("height", height);
+    .attr("width", height)
+    .attr("height", width);
 
 var firstUser = null;
 

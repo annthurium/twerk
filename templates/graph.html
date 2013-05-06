@@ -1,3 +1,4 @@
+
 <head>
   <link href='http://fonts.googleapis.com/css?family=Quicksand:300,400,700' rel='stylesheet' type='text/css'></link>
 </head>
@@ -91,8 +92,7 @@ var area = d3.svg.area()
     .x0(function(d) { return yScale(d.y0); })
     .x1(function(d) { return yScale(d.y0 + d.y); })
     .y(function(d) { return xScale(d.x); })
-    .interpolate('basis');  // this is important for a smooth cunt.
-
+    .interpolate('basis-open');
   var svg = d3.select("body")
   .append("svg")
     .attr("width", height)
@@ -100,11 +100,13 @@ var area = d3.svg.area()
 
 var firstUser = null;
 
-var userColor1 = d3.scale.linear()
-    .range(["#240", "#2f0"]);
-
 var userColor2 = d3.scale.linear()
-    .range(["#640", "#fe0"]);
+    // reds
+    .range(["#FF00FF", "#800000"]);
+
+var userColor1 = d3.scale.linear()
+    // 
+    .range(["#00FFFF", "#008080"]);
 
 svg.selectAll("path")
   .data(stackedLayers)

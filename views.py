@@ -63,6 +63,7 @@ def list_tweets():
 
 @app.route("/analysis")
 def analysis():
+
     tweet_list_1 = query_for_tweets(session['user_1_screen_name'], session['user_2_screen_name'])
     tweet_list_2 = query_for_tweets(session['user_2_screen_name'], session['user_1_screen_name'])
     summary_1 = rid_analyze(tweet_list_1)
@@ -81,8 +82,16 @@ Point = collections.namedtuple('Point', ['x', 'y'])
 
 @app.route("/graph")
 def make_graph():
-    tweet_list_1 = query_for_tweets(session['user_1_screen_name'], session['user_2_screen_name'])
-    tweet_list_2 = query_for_tweets(session['user_2_screen_name'], session['user_1_screen_name'])
+    user_1_screen_name = strip_leading_ampersand(request.args.get('user_1_screen_name'))
+    user_2_screen_name = strip_leading_ampersand(request.args.get('user_2_screen_name'))
+    # check to see if this data already exists in session
+    # if not, send them back to the index page to enter their data
+    seed.get_tweets(user_1_screen_name)
+    seed.get_tweets(user_2_screen_name)
+
+    tweet_list_1 = query_for_tweets(user_1_screen_name, user_2_screen_name)
+    tweet_list_2 = query_for_tweets(user_2_screen_name, user_1_screen_name)
+
     tweet_analyses = []
 
     layers = {}
@@ -91,7 +100,7 @@ def make_graph():
         all_summaries = {}
         for item in summary:
             all_summaries[ScoreKey(name = item.name, 
-                                   type = item.type)] = item.count 
+                                   type = item.type)] = item.count
             layers[LayerKey(from_user=tweet.from_user_screen_name, name=item.name, type=item.type)] = []
         tweet_analyses.append(AnalyzedTweet(ts = tweet.time_stamp,
                                             id = tweet.id,
@@ -110,14 +119,16 @@ def make_graph():
 
     json_layers = []
     for layer in layers:
-        json_layers.append({'name': '%s: %s, %s' % (layer.from_user, layer.type, layer.name),
-                            'username': layer.from_user,
+        json_layers.append({'name': '%s: %s, %s' %
+            (layer.from_user,
+             layer.type, layer.name),
+                            'username': layer.from_user,                            
                             'values': [{'x': x, 'y': y} for x, y in enumerate(layers[layer])]})
     return render_template("graph.html", 
         data=json.dumps(json_layers),
         tweet_list = sorted_tweets,
-        user1=session['user_1_screen_name'],
-        user2=session['user_2_screen_name'],
+        user1=user_1_screen_name,
+        user2=user_2_screen_name,
         num_tweets=len(sorted_tweets))
 
 def old_make_graph():

@@ -75,6 +75,8 @@ def analysis():
                             user_2 = session['user_2_screen_name'])
 
 
+
+# Creating classes of named tuple
 ScoreKey = collections.namedtuple('Score', ['name', 'type'])
 AnalyzedTweet = collections.namedtuple('AnalyzedTweet', ['ts', 'id', 'summary', 'text', 'from_user'])
 LayerKey = collections.namedtuple('LayerKey', ['from_user', 'name', 'type'])
@@ -131,43 +133,44 @@ def make_graph():
         user2=user_2_screen_name,
         num_tweets=len(sorted_tweets))
 
-def old_make_graph():
-    tweet_list_1 = query_for_tweets(session['user_1_screen_name'], session['user_2_screen_name'])
-    tweet_list_2 = query_for_tweets(session['user_2_screen_name'], session['user_1_screen_name'])
-    list_1_len = count_list_of_tweets(tweet_list_1)
 
-    # find earliest tweet in either list
-    # this code assumes tweets are ordered from least recent to most recent
-    # and they should be, because the database orders tweets sequentially by id number
-    list_1_start_date = tweet_list_1[0].time_stamp
-    list_2_start_date = tweet_list_2[0].time_stamp
+# def old_make_graph():
+#     tweet_list_1 = query_for_tweets(session['user_1_screen_name'], session['user_2_screen_name'])
+#     tweet_list_2 = query_for_tweets(session['user_2_screen_name'], session['user_1_screen_name'])
+#     list_1_len = count_list_of_tweets(tweet_list_1)
 
-    earliest_date = min(list_1_start_date, list_2_start_date)
+#     # find earliest tweet in either list
+#     # this code assumes tweets are ordered from least recent to most recent
+#     # and they should be, because the database orders tweets sequentially by id number
+#     list_1_start_date = tweet_list_1[0].time_stamp
+#     list_2_start_date = tweet_list_2[0].time_stamp
 
-    # find latest tweet in either list
-    list_1_end_date = tweet_list_2[-1].time_stamp
-    list_2_end_date = tweet_list_2[-1].time_stamp
+#     earliest_date = min(list_1_start_date, list_2_start_date)
 
-    latest_date = max(list_1_end_date, list_2_end_date)
+#     # find latest tweet in either list
+#     list_1_end_date = tweet_list_2[-1].time_stamp
+#     list_2_end_date = tweet_list_2[-1].time_stamp
+
+#     latest_date = max(list_1_end_date, list_2_end_date)
 
 
-    def tweets_by_month(tweets):
-        month = None
-        batch = []
-        for tweet in tweets:
-            if month != tweet.time_stamp.month:
-                if batch: # if batch is not empty
-                    yield batch
-                month = tweet.time_stamp.month
-                batch = []
-            batch.append(tweet)
+#     def tweets_by_month(tweets):
+#         month = None
+#         batch = []
+#         for tweet in tweets:
+#             if month != tweet.time_stamp.month:
+#                 if batch: # if batch is not empty
+#                     yield batch
+#                 month = tweet.time_stamp.month
+#                 batch = []
+#             batch.append(tweet)
 
-    for batch in tweets_by_month(tweet_list_1):
-        for tweet in batch:
-            print tweet.time_stamp
-        print "\n"
+#     for batch in tweets_by_month(tweet_list_1):
+#         for tweet in batch:
+#             print tweet.time_stamp
+#         print "\n"
 
-    return
+#     return
     # month_year_list = []
     # months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
     # start_year = earliest_date.year
@@ -284,18 +287,18 @@ def old_make_graph():
 ##### Helper functions #####
 
 
-##### These are for the "bucket" method of showing tweets over time.
-def make_sub_list(list_of_tweets, n, list_length):
-    """Divides list of tweets into length of size n.
-    Returns concatented text from list of tweets"""
-    return [cat_list_of_tweets(list_of_tweets[i:i + n]) for i in range(0, list_length, n)]
+# ##### These are for the "bucket" method of showing tweets over time.
+# def make_sub_list(list_of_tweets, n, list_length):
+#     """Divides list of tweets into length of size n.
+#     Returns concatented text from list of tweets"""
+#     return [cat_list_of_tweets(list_of_tweets[i:i + n]) for i in range(0, list_length, n)]
 
-def count_list_of_tweets(list_of_tweets):
-    """ Seems like there should be a better way to do this but I couldn't find one."""
-    count = 0
-    for item in list_of_tweets:
-        count += 1
-    return count
+# def count_list_of_tweets(list_of_tweets):
+#     """ Seems like there should be a better way to do this but I couldn't find one."""
+#     count = 0
+#     for item in list_of_tweets:
+#         count += 1
+#     return count
 
 
 

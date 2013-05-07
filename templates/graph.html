@@ -1,8 +1,5 @@
 
-<head>
-  <link href='http://fonts.googleapis.com/css?family=Quicksand:300,400,700' rel='stylesheet' type='text/css'></link>
-</head>
-
+{% extends "layout.html" %}
 {% block body %}
 
 {% for i in range(num_tweets) %}
@@ -15,37 +12,27 @@
   </div>
 {% endfor %}
 
-<style>
-body {
-  font-family: 'Quicksand', "Helvetica Neue", Helvetica, Arial, sans-serif;
-  position: relative;
-  padding: 0;
-  margin: 0;
-  color: #eee;
-  background: #222;
-}
-
-svg {
-  margin-top: 0;
-  margin-left: 50%;
-}
-
-.tweet {
-  position: absolute;
-  width: 400px;
-  height: 50px;
-  line-height: 1.1em;
-  font-size: 10pt;
-  text-align: right;
-  left: 20%;
-  font-weight: 300;
-}
-
-.tweet.user2 {
-  color: #aaf;
-}
-
-</style>
+     <form class="form" method="get" action="/graph">
+        <div class="box">
+          <h1>Visualize A Relationship</h1>
+          <label>
+            <span>Twitter username:</span>
+          </label>
+          <br>
+          <input type="text" class="input_text" name="user_1_screen_name"
+               id="user_1_screen_name">
+          <br>
+          <label>
+            <span>Twitter username:</span>
+          </label>
+          <br>
+          <input type="text" class="input_text" name="user_2_screen_name"
+                id="user_2_screen_name">
+          <br>
+          <input type="submit" class="button" value="visualize" action="submit"/>
+          <br>
+        </div>
+    </form>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 

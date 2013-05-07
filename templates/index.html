@@ -1,126 +1,10 @@
-<!doctype html>
-<html>
-<head>
-  <link href='http://fonts.googleapis.com/css?family=Quicksand:300,400,700' rel='stylesheet' type='text/css'></link>
-</head>
 
-<style>
-body {
-  font-family: 'Quicksand', "Helvetica Neue", Helvetica, Arial, sans-serif;
-  position: relative;
-  padding: 0;
-  margin: 0;
-  color: #eee;
-  background: #222;
-}
-
-svg {
-  margin-top: 0;
-  margin-left: 50%;
-}
-
-label {
-  width: 4em;
-  float: left;
-  text-align: right;
-  margin-right: 0.5 em;
-  display: block
-}
-
-.submit input {
-  margin-left: 4.5 em;
-}
-
-.tweet {
-  position: absolute;
-  width: 400px;
-  height: 50px;
-  line-height: 1.1em;
-  font-size: 10pt;
-  text-align: right;
-  left: 20%;
-  font-weight: 300;
-}
-
-.tweet.user2 {
-  color: #aaf;
-}
-
-
-*{ margin:0; padding:0;}
-
-body{background:#161712;}
-form,input,select,textarea{margin:0; padding:0; color:#ffffff;}
-
-div.box {
-  margin:0 auto;
-  width:300px;
-  background:#222222;
-  position:absolute;
-  top:100px;
-  right:10px;
-  border:1px solid #262626;
-}
-
-div.box h1 { 
-  color:#ffffff;
-  font-size:18px;
-  padding:5px 0 5px 5px;
-  border-bottom:1px solid #161712;
-  border-top:1px solid #161712; 
-}
-
-div.box label {
-  width:100%;
-  display: block;
- float:left;
-  /*background:#1C1C1C;*/
-  /*border-top:1px solid #262626;
-  border-bottom:1px solid #161712;*/
-  padding:10px 0 10px 0;
-}
-
-div.box label span {
-  display: block;
-  color:#bbbbbb;
-  font-size:12px;
-  width:200px;
-  text-align:left;
-  padding:5px 20px 0 0;
-}
-
-div.box .input_text {
-  padding:10px 10px;
-  width:200px;
-  text-align:left;
-  background:#262626;
-  border-bottom: 1px double #171717;
-  border-top: 1px double #171717;
-  border-left:1px double #333333;
-  border-right:1px double #333333;
-}
-
-div.box .button {
-  margin:0 0 10px 0;
-  padding:4px 7px;
-  background:#909090;
-  border:0px;
-  position: relative;
-  top:10px;
-  /*left:382px;*/
-  width:100px;
-  border-bottom: 1px double #000000;
-  border-top: 1px double #000000;
-  border-left:1px double #000033;
-  border-right:1px double #000033;
-}
-
-</style>
+{% extends "custom-layout.html" %}
 
 {% block body %}
-    <title>140youandme</title>
-    <h1>Are you ready for some cupcakes, bitches?</h1>
-    Some stuff will go here evetually but for now it's just filler.
+    <title>140 You And Me</title>
+    <h1>140 You And Me</h1>
+    If a relationship was a river, what would it look like?
 
      <form class="form" method="get" action="/graph">
         <div class="box">
@@ -143,27 +27,4 @@ div.box .button {
           <br>
         </div>
     </form>
-
-<!--bootstrap form. deprecated.
-    <form class="form" method="get" action="/graph">
-  <div class="control-group">
-    <label class="control-label" for="user_1_screen_name">Twitter name</label>
-    <div class="controls">
-      <input type="text" id="user_1_screen_name" name="user_1_screen_name" placeholder="@whomever">
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label" for="user_2_screen_name">Twitter name</label>
-    <div class="controls">
-      <input type="text" id="user_2_screen_name" name="user_2_screen_name" placeholder="@your_mom">
-    </div>
-  </div>
-  <div class="control-group">
-    <div class="controls">
-      <button type="submit" class="btn btn-large btn-inverse">Analyze</button>
-    </div>
-  </div>
-</form>
--->
-
 {% endblock %}

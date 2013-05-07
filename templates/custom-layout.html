@@ -6,7 +6,7 @@
     <link href="/static/css/style.css" rel="stylesheet">
   </head>
   <body>
-    <link href='http://fonts.googleapis.com/css?family=Quicksand:300,400,700' rel='stylesheet' type='text/css'></link>
+  	<link href='http://fonts.googleapis.com/css?family=Quicksand:300,400,700' rel='stylesheet' type='text/css'></link>
 </head>
 
 <style>
@@ -129,8 +129,14 @@ html, body {height: 100%;}
   clear:both;} 
 
 </style>
-    {% block body %}
+<div id="wrap">
+  <div id="main">
+  	{% block body %}
       {% endblock %}
-
+</div>
+</div>
+<div id="footer">
+<a href="/about"><em>about</em></a> | <a href="/contact"><em>contact</a></em>
+</div>
 </body>
 </html>

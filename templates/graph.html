@@ -33,7 +33,7 @@
           <br>
         </div>
     </form>
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/d3.v3.js"></script>
 <script>
 
 
@@ -65,15 +65,6 @@ var yScale = d3.scale.linear()
     )
   ])
     .range([height, 0]);
-    
-/*
-var area = d3.svg.area()
-    .x(function(d) { return xScale(d.x) })
-    // y0 is the baseline value
-    .y0(function(d) { return yScale(d.y0); })
-    .y1(function(d) { return yScale(d.y + d.y0);})
-    .interpolate('basis-open');
-    */
 
 var area = d3.svg.area()
     .x0(function(d) { return yScale(d.y0); })

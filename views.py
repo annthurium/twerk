@@ -3,6 +3,8 @@
 from flask import Flask, render_template, redirect, request, url_for, flash, session, g, jsonify
 from model import session as db_session, User, Tweet
 from sqlalchemy import or_
+from flask_heroku import Heroku
+import os
 import model
 import seed
 import en
@@ -15,6 +17,9 @@ from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.secret_key = "dumbass_horse_battery_staple_FOREVAR_AND_EVAR"
+
+# do I need this code? Hmm.
+app.config.from_object(__name__)
 
 @app.teardown_request
 def shutdown_session(exception = None):
@@ -73,8 +78,6 @@ def analysis():
                             rid_summary_2=summary_2,
                             user_1 = session['user_1_screen_name'],
                             user_2 = session['user_2_screen_name'])
-
-
 
 # Creating classes of named tuple
 ScoreKey = collections.namedtuple('Score', ['name', 'type'])
@@ -328,4 +331,8 @@ def query_for_tweets(user_1_screen_name, user_2_screen_name):
     return tweet_list
 
 if __name__== "__main__":
-	app.run(debug = True)
+    db_uri = app.config.get('SQLALCHEMY_DATABASE_URI')
+    if not db_uri:
+        db_uri = "sqlite:///twerk.db"
+    model.connect(db_uri)
+    app.run(debug=True, port=int(os.environ.get("PORT", 5000)), host = "0.0.0.0")

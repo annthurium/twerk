@@ -6,6 +6,10 @@ from sqlalchemy import Column, Integer, String, DateTime, func, or_
 from sqlalchemy.orm import sessionmaker, relationship, backref, scoped_session
 from datetime import datetime
 
+import os
+
+db_uri = os.environ.get("DATABASE_URL", "sqlite:///twerk.db")
+
 # engine, session are thread local
 engine = create_engine("sqlite:///twerk.db", echo = False)
 session = scoped_session(sessionmaker(bind=engine,
@@ -18,7 +22,8 @@ Base.query = session.query_property()
 class Tweet(Base):
 	__tablename__ = "tweets"
 
-	id = Column(Integer, primary_key = True)
+	id = Column(Integer)
+	twitter_id = Column(Integer, primary_key = True)
 	from_user_id = Column(Integer)
 	from_user_screen_name = Column(String(64))
 	text = Column(String(150))
@@ -36,6 +41,14 @@ class User(Base):
 	screen_name = Column(String(64))
 	first_last_name = Column(String(256))
 	profile_img_url = Column(String(500))
+
+def connect(db_uri="sqlite:///twerk.db"):
+    global engine
+    global session
+    engine = create_engine(db_uri, echo=False) 
+    session = scoped_session(sessionmaker(bind=engine,
+                             autocommit = False,
+                             autoflush = False))
 
 def main():
     """This might come in handy someday"""
